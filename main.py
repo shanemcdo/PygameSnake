@@ -65,8 +65,13 @@ class PySnake(GameScreen):
         self.grid_size = Point(20, 20)
         self.cell_size = Point(15, 15)
         self.reset()
-        self.head_image = pygame.Surface(self.cell_size)
-        self.head_image.fill('#000099')
+        head_image = pygame.image.load('assets/head.png')
+        self.head_images = {
+                Direction.UP: head_image,
+                Direction.LEFT: pygame.transform.rotate(head_image, 90),
+                Direction.DOWN: pygame.transform.rotate(head_image, 180),
+                Direction.RIGHT: pygame.transform.rotate(head_image, 270),
+                }
         self.fruit_image = pygame.Surface(self.cell_size)
         self.fruit_image.fill('#990000')
         self.movement_delay = TrueEvery(5)
@@ -106,6 +111,7 @@ class PySnake(GameScreen):
         self.previous_head = self.head
         self.tail = []
         self.direction = Direction.UP
+        self.last_direction = self.direction
         self.length_to_add = 2
         self.score = 0
         self.fruit = self.new_fruit()
@@ -125,11 +131,11 @@ class PySnake(GameScreen):
                     self.screen.fill('#007200', ((j * self.cell_size.x, i * self.cell_size.y), self.cell_size))
 
     def draw_head(self):
-        self.screen.blit(self.head_image, (self.head.x * self.cell_size.x, self.head.y * self.cell_size.y))
+        self.screen.blit(self.head_images[self.last_direction], (self.head.x * self.cell_size.x, self.head.y * self.cell_size.y))
 
     def draw_tail(self):
         for pos in self.tail:
-            self.screen.blit(self.head_image, (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
+            self.screen.blit(self.fruit_image, (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
 
     def draw_fruit(self):
         self.screen.blit(self.fruit_image, (self.fruit.x * self.cell_size.x, self.fruit.y * self.cell_size.y))
@@ -139,6 +145,7 @@ class PySnake(GameScreen):
 
     def move(self):
         self.previous_head = copy(self.head)
+        self.last_direction = self.direction
         if self.direction == Direction.UP:
             self.head.y -= 1
         elif self.direction == Direction.LEFT:
