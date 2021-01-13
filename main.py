@@ -6,10 +6,10 @@ from pygame_tools import *
 from random import randrange, choice
 
 class Direction(Enum):
-    UP = 'w'
-    LEFT = 'a'
-    DOWN = 's'
-    RIGHT = 'd'
+    UP = 0
+    LEFT = 270
+    DOWN = 180
+    RIGHT = 90
 
 class DeathScreen(MenuScreen):
 
@@ -79,12 +79,19 @@ class PySnake(GameScreen):
                 Direction.DOWN: pygame.transform.rotate(tail_image, 180),
                 Direction.RIGHT: pygame.transform.rotate(tail_image, 270),
                 }
-        tail_curve_image = pygame.image.load('assets/tail_curve.png')
-        self.tail_curve_images = {
-                Direction.UP: tail_curve_image,
-                Direction.LEFT: pygame.transform.rotate(tail_curve_image, 90),
-                Direction.DOWN: pygame.transform.rotate(tail_curve_image, 180),
-                Direction.RIGHT: pygame.transform.rotate(tail_curve_image, 270),
+        tail_curve_right_image = pygame.image.load('assets/tail_curve_right.png')
+        self.tail_curve_right_images = {
+                Direction.UP: tail_curve_right_image,
+                Direction.LEFT: pygame.transform.rotate(tail_curve_right_image, 90),
+                Direction.DOWN: pygame.transform.rotate(tail_curve_right_image, 180),
+                Direction.RIGHT: pygame.transform.rotate(tail_curve_right_image, 270),
+                }
+        tail_curve_left_image = pygame.image.load('assets/tail_curve_left.png')
+        self.tail_curve_left_images = {
+                Direction.UP: tail_curve_left_image,
+                Direction.LEFT: pygame.transform.rotate(tail_curve_left_image, 90),
+                Direction.DOWN: pygame.transform.rotate(tail_curve_left_image, 180),
+                Direction.RIGHT: pygame.transform.rotate(tail_curve_left_image, 270),
                 }
         tail_end_image = pygame.image.load('assets/tail_end.png')
         self.tail_end_images = {
@@ -163,7 +170,16 @@ class PySnake(GameScreen):
             elif direction == prev_direction:
                 self.screen.blit(self.tail_images[direction], (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
             else:
-                self.screen.blit(self.tail_curve_images[direction], (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
+                if direction == Direction.RIGHT or direction == Direction.UP:
+                    if prev_pos.x + prev_pos.y - pos.x - pos.y < 0:
+                        self.screen.blit(self.tail_curve_left_images[direction], (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
+                    else:
+                        self.screen.blit(self.tail_curve_right_images[direction], (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
+                else:
+                    if prev_pos.x + prev_pos.y - pos.x - pos.y < 0:
+                        self.screen.blit(self.tail_curve_right_images[direction], (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
+                    else:
+                        self.screen.blit(self.tail_curve_left_images[direction], (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
             prev_pos = pos
             prev_direction = direction
 
