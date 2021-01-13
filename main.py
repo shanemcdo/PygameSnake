@@ -1,4 +1,5 @@
 import pygame
+from copy import copy
 from enum import Enum
 from pygame.locals import *
 from pygame_tools import *
@@ -19,9 +20,10 @@ class PySnake(GameScreen):
         self.grid_size = Point(20, 20)
         self.cell_size = Point(15, 15)
         self.head = Point(self.grid_size.x // 2, self.grid_size.y // 2)
+        self.previous_head = self.head
         self.tail = []
         self.direction = Direction.UP
-        self.length = 0
+        self.length_to_add = 2
         self.score = 0
         self.fruit = self.new_fruit()
         self.head_image = pygame.Surface(self.cell_size)
@@ -34,16 +36,18 @@ class PySnake(GameScreen):
     def update(self):
         self.draw_background()
         self.draw_head()
+        self.draw_tail()
         self.draw_fruit()
         self.draw_score()
         if self.movement_delay():
             self.move()
+            self.update_tail()
             if self.check_collision():
                 print('I\'m super dead!')
             elif self.check_fruit():
                 self.score += 1
+                self.length_to_add += 2
                 self.fruit = self.new_fruit()
-
 
     def key_down(self, event: pygame.event.Event):
         if event.key == K_w:
@@ -55,6 +59,13 @@ class PySnake(GameScreen):
         elif event.key == K_d:
             self.direction = Direction.RIGHT
 
+    def update_tail(self):
+        self.tail.insert(0, self.previous_head)
+        if self.length_to_add > 0:
+            self.length_to_add -= 1
+        else:
+            self.tail.pop(-1)
+
     def draw_background(self):
         self.screen.fill('#008000')
         for i in range(self.grid_size.y):
@@ -65,6 +76,10 @@ class PySnake(GameScreen):
     def draw_head(self):
         self.screen.blit(self.head_image, (self.head.x * self.cell_size.x, self.head.y * self.cell_size.y))
 
+    def draw_tail(self):
+        for pos in self.tail:
+            self.screen.blit(self.head_image, (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
+
     def draw_fruit(self):
         self.screen.blit(self.fruit_image, (self.fruit.x * self.cell_size.x, self.fruit.y * self.cell_size.y))
 
@@ -72,6 +87,7 @@ class PySnake(GameScreen):
         self.screen.blit(self.score_font.render(f'Score: {self.score}', True, (255, 255, 255)), (2, 2))
 
     def move(self):
+        self.previous_head = copy(self.head)
         if self.direction == Direction.UP:
             self.head.y -= 1
         elif self.direction == Direction.LEFT:
