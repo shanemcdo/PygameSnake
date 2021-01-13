@@ -388,4 +388,3 @@ class MenuScreen(GameScreen):
                 if button.rect.collidepoint(mouse_pos):
                     self.button_index = i
                     button()
-
