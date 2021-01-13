@@ -11,6 +11,46 @@ class Direction(Enum):
     DOWN = 's'
     RIGHT = 'd'
 
+class DeathScreen(MenuScreen):
+
+    def __init__(self, screen: pygame.Surface, real_window_size: Point, window_size: Point, score: int):
+        super().__init__(screen, real_window_size, window_size)
+        self.play_again = True
+        self.button_font = pygame.font.SysFont('Consolas', 13)
+        self.sub_window_size = Point(200, 200)
+        self.sub_window = pygame.Surface(self.sub_window_size)
+        self.button_size = Point(80, 20)
+        self.buttons = [
+                Button(self.play_again_function, 'Play again?', Rect((10, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font),
+                Button(self.exit, 'Quit', Rect((self.sub_window_size.x - 10 - self.button_size.x, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font)
+                ]
+        self.sub_window_rect = Rect((0, 0), self.sub_window_size)
+        self.sub_window_rect.center = self.window_size.x // 2, self.window_size.y // 2
+
+    def mouse_button_down(self, event: pygame.event.Event):
+        if event.button == 1:
+            mouse_pos = Point._make(pygame.mouse.get_pos())
+            mouse_pos = Point(mouse_pos.x // self.window_scale.x, mouse_pos.y // self.window_scale.y)
+            for i, button in enumerate(self.buttons):
+                print(Rect(((button.rect.x + self.sub_window_rect.x, button.rect.y + self.sub_window_rect.y), button.rect.size)))
+                print(mouse_pos)
+                if Rect((button.rect.x + self.sub_window_rect.x, button.rect.y + self.sub_window_rect.y), button.rect.size).collidepoint(mouse_pos):
+                    self.button_index = i
+                    button()
+
+    def play_again_function(self):
+        self.play_again = True
+        self.running = False
+
+    def exit(self):
+        self.play_again = False
+        self.running = False
+
+    def update(self):
+        self.sub_window.fill((30, 30, 30))
+        self.draw_buttons(self.sub_window)
+        self.screen.blit(self.sub_window, self.sub_window_rect)
+
 class PySnake(GameScreen):
 
     def __init__(self):
@@ -19,17 +59,11 @@ class PySnake(GameScreen):
         super().__init__(pygame.display.set_mode(real_size), real_size, Point(real_size.x / 2, real_size.y / 2))
         self.grid_size = Point(20, 20)
         self.cell_size = Point(15, 15)
-        self.head = Point(self.grid_size.x // 2, self.grid_size.y // 2)
-        self.previous_head = self.head
-        self.tail = []
-        self.direction = Direction.UP
-        self.length_to_add = 2
-        self.score = 0
-        self.fruit = self.new_fruit()
+        self.reset()
         self.head_image = pygame.Surface(self.cell_size)
-        self.head_image.fill('blue')
+        self.head_image.fill('#990000')
         self.fruit_image = pygame.Surface(self.cell_size)
-        self.fruit_image.fill('red')
+        self.fruit_image.fill('#000099')
         self.movement_delay = TrueEvery(5)
         self.score_font = pygame.font.SysFont('Consolas', 10)
 
@@ -43,7 +77,10 @@ class PySnake(GameScreen):
             self.move()
             self.update_tail()
             if self.check_collision():
-                print('I\'m super dead!')
+                death_screen = DeathScreen(self.real_screen, self.real_window_size, self.window_size, self.score)
+                death_screen.run()
+                self.reset()
+                self.running = death_screen.play_again
             elif self.check_fruit():
                 self.score += 1
                 self.length_to_add += 2
@@ -58,6 +95,15 @@ class PySnake(GameScreen):
             self.direction = Direction.DOWN
         elif event.key == K_d:
             self.direction = Direction.RIGHT
+
+    def reset(self):
+        self.head = Point(self.grid_size.x // 2, self.grid_size.y // 2)
+        self.previous_head = self.head
+        self.tail = []
+        self.direction = Direction.UP
+        self.length_to_add = 2
+        self.score = 0
+        self.fruit = self.new_fruit()
 
     def update_tail(self):
         self.tail.insert(0, self.previous_head)

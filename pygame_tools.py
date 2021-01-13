@@ -289,6 +289,7 @@ class GameScreen:
         self.real_screen = screen
         self.screen = screen if not self.window_scaled else pygame.Surface(window_size)
         self.real_window_size = real_window_size
+        self.window_scale = Point(real_window_size.x // window_size.x, real_window_size.y // window_size.y)
         self.window_size = window_size if self.window_scaled else real_window_size
         self.frame_rate = frame_rate
         self.running = False
@@ -368,17 +369,21 @@ class MenuScreen(GameScreen):
         elif event.key == K_RETURN or event.key == K_SPACE:
             self.buttons[self.button_index]()
 
-    def draw_buttons(self):
+    def draw_buttons(self, screen: pygame.Surface = None):
         """Draw the buttons"""
+        if not screen:
+            screen = self.screen
         for i, button in enumerate(self.buttons):
-            button.draw(self.screen, True if i == self.button_index else None)
+            button.draw(screen, True if i == self.button_index else None)
 
     def update(self):
         self.draw_buttons()
 
     def mouse_button_down(self, event: pygame.event.Event):
         if event.button == 1:
-            mouse_pos = pygame.mouse.get_pos()
+            mouse_pos = Point._make(pygame.mouse.get_pos())
+            if self.window_scaled:
+                mouse_pos = Point(mouse_pos.x // self.window_scale.x, mouse_pos.y // self.window_scale.y)
             for i, button in enumerate(self.buttons):
                 if button.rect.collidepoint(mouse_pos):
                     self.button_index = i
