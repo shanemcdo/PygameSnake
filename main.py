@@ -118,13 +118,13 @@ class PySnake(GameScreen):
                 self.fruit = self.new_fruit()
 
     def key_down(self, event: pygame.event.Event):
-        if event.key == K_w and self.direction != Direction.DOWN:
+        if event.key == K_w and self.last_direction != Direction.DOWN:
             self.direction = Direction.UP
-        elif event.key == K_a and self.direction != Direction.RIGHT:
+        elif event.key == K_a and self.last_direction != Direction.RIGHT:
             self.direction = Direction.LEFT
-        elif event.key == K_s and self.direction != Direction.UP:
+        elif event.key == K_s and self.last_direction != Direction.UP:
             self.direction = Direction.DOWN
-        elif event.key == K_d and self.direction != Direction.LEFT:
+        elif event.key == K_d and self.last_direction != Direction.LEFT:
             self.direction = Direction.RIGHT
 
     def reset(self):
