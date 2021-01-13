@@ -19,11 +19,11 @@ class DeathScreen(MenuScreen):
         self.play_again = True
         self.button_font = pygame.font.SysFont('Consolas', 13)
         self.sub_window_size = Point(200, 100)
-        self.sub_window = pygame.Surface(self.sub_window_size)
-        self.button_size = Point(80, 20)
+        self.sub_window = pygame.Surface(self.sub_window_size, flags = SRCALPHA)
+        self.button_size = Point(85, 20)
         self.buttons = [
-                Button(self.play_again_function, 'Play again?', Rect((10, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font),
-                Button(self.exit, 'Quit', Rect((self.sub_window_size.x - 10 - self.button_size.x, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font)
+                Button(self.play_again_function, 'Play again?', Rect((10, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font, border_radius = 8, border_size = 1),
+                Button(self.exit, 'Quit', Rect((self.sub_window_size.x - 10 - self.button_size.x, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font, border_radius = 8, border_size = 1)
                 ]
         self.sub_window_rect = Rect((0, 0), self.sub_window_size)
         self.title_text = pygame.font.SysFont('Consolas', 24).render('You Died!', True, (255, 255, 255))
@@ -50,7 +50,6 @@ class DeathScreen(MenuScreen):
         self.running = False
 
     def update(self):
-        self.sub_window.fill((30, 30, 30))
         self.draw_buttons(self.sub_window)
         self.sub_window.blit(self.title_text, self.title_pos)
         self.sub_window.blit(self.sub_title_text, self.sub_title_pos)
@@ -102,6 +101,7 @@ class PySnake(GameScreen):
                 }
         self.fruit_image = pygame.image.load('assets/logo.png')
         pygame.display.set_icon(self.fruit_image)
+        self.fruit_image = pygame.image.load('assets/logo.png')
         self.movement_delay = TrueEvery(5)
         self.score_font = pygame.font.SysFont('Consolas', 10)
 
