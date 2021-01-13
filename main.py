@@ -2,7 +2,7 @@ import pygame
 from enum import Enum
 from pygame.locals import *
 from pygame_tools import *
-from random import randrange
+from random import randrange, choice
 
 class Direction(Enum):
     UP = 'w'
@@ -19,18 +19,31 @@ class PySnake(GameScreen):
         self.grid_size = Point(20, 20)
         self.cell_size = Point(15, 15)
         self.head = Point(self.grid_size.x // 2, self.grid_size.y // 2)
+        self.tail = []
         self.direction = Direction.UP
         self.length = 0
-        self.fruit = self.random_spot_on_board()
+        self.score = 0
+        self.fruit = self.new_fruit()
         self.head_image = pygame.Surface(self.cell_size)
         self.head_image.fill('blue')
+        self.fruit_image = pygame.Surface(self.cell_size)
+        self.fruit_image.fill('red')
         self.movement_delay = TrueEvery(5)
+        self.score_font = pygame.font.SysFont('Consolas', 10)
 
     def update(self):
         self.draw_background()
         self.draw_head()
+        self.draw_fruit()
+        self.draw_score()
         if self.movement_delay():
             self.move()
+            if self.check_collision():
+                print('I\'m super dead!')
+            elif self.check_fruit():
+                self.score += 1
+                self.fruit = self.new_fruit()
+
 
     def key_down(self, event: pygame.event.Event):
         if event.key == K_w:
@@ -52,6 +65,12 @@ class PySnake(GameScreen):
     def draw_head(self):
         self.screen.blit(self.head_image, (self.head.x * self.cell_size.x, self.head.y * self.cell_size.y))
 
+    def draw_fruit(self):
+        self.screen.blit(self.fruit_image, (self.fruit.x * self.cell_size.x, self.fruit.y * self.cell_size.y))
+
+    def draw_score(self):
+        self.screen.blit(self.score_font.render(f'Score: {self.score}', True, (255, 255, 255)), (2, 2))
+
     def move(self):
         if self.direction == Direction.UP:
             self.head.y -= 1
@@ -62,8 +81,27 @@ class PySnake(GameScreen):
         elif self.direction == Direction.RIGHT:
             self.head.x += 1
 
+    def check_collision(self):
+        if self.head.x < 0 or self.head.x >= self.grid_size.x or self.head.y < 0 or self.head.y >= self.grid_size.y or self.head in self.tail:
+            return True
+        return False
+
     def random_spot_on_board(self):
         return Point(randrange(0, self.grid_size.x), randrange(0, self.grid_size.y))
+
+    def check_fruit(self):
+        return self.fruit == self.head
+
+    def new_fruit(self):
+        possible_spots = []
+        for i in range(self.grid_size.y):
+            for j in range(self.grid_size.x):
+                possible_spots.append(Point(j, i))
+        possible_spots.remove(self.head)
+        for spot in self.tail:
+            possible_spots.remove(spot)
+        return choice(possible_spots)
+
 
 if __name__ == '__main__':
     PySnake().run()
