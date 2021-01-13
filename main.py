@@ -72,6 +72,27 @@ class PySnake(GameScreen):
                 Direction.DOWN: pygame.transform.rotate(head_image, 180),
                 Direction.RIGHT: pygame.transform.rotate(head_image, 270),
                 }
+        tail_image = pygame.image.load('assets/tail.png')
+        self.tail_images = {
+                Direction.UP: tail_image,
+                Direction.LEFT: pygame.transform.rotate(tail_image, 90),
+                Direction.DOWN: pygame.transform.rotate(tail_image, 180),
+                Direction.RIGHT: pygame.transform.rotate(tail_image, 270),
+                }
+        tail_curve_image = pygame.image.load('assets/tail_curve.png')
+        self.tail_curve_images = {
+                Direction.UP: tail_curve_image,
+                Direction.LEFT: pygame.transform.rotate(tail_curve_image, 90),
+                Direction.DOWN: pygame.transform.rotate(tail_curve_image, 180),
+                Direction.RIGHT: pygame.transform.rotate(tail_curve_image, 270),
+                }
+        tail_end_image = pygame.image.load('assets/tail_end.png')
+        self.tail_end_images = {
+                Direction.UP: tail_end_image,
+                Direction.LEFT: pygame.transform.rotate(tail_end_image, 90),
+                Direction.DOWN: pygame.transform.rotate(tail_end_image, 180),
+                Direction.RIGHT: pygame.transform.rotate(tail_end_image, 270),
+                }
         self.fruit_image = pygame.Surface(self.cell_size)
         self.fruit_image.fill('#990000')
         self.movement_delay = TrueEvery(5)
@@ -117,7 +138,7 @@ class PySnake(GameScreen):
         self.fruit = self.new_fruit()
 
     def update_tail(self):
-        self.tail.insert(0, self.previous_head)
+        self.tail.insert(0, (self.previous_head, self.last_direction))
         if self.length_to_add > 0:
             self.length_to_add -= 1
         else:
@@ -134,8 +155,8 @@ class PySnake(GameScreen):
         self.screen.blit(self.head_images[self.last_direction], (self.head.x * self.cell_size.x, self.head.y * self.cell_size.y))
 
     def draw_tail(self):
-        for pos in self.tail:
-            self.screen.blit(self.fruit_image, (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
+        for pos, direction in self.tail:
+            self.screen.blit(self.tail_images[direction], (pos.x * self.cell_size.x, pos.y * self.cell_size.y))
 
     def draw_fruit(self):
         self.screen.blit(self.fruit_image, (self.fruit.x * self.cell_size.x, self.fruit.y * self.cell_size.y))
@@ -156,7 +177,7 @@ class PySnake(GameScreen):
             self.head.x += 1
 
     def check_collision(self):
-        if self.head.x < 0 or self.head.x >= self.grid_size.x or self.head.y < 0 or self.head.y >= self.grid_size.y or self.head in self.tail:
+        if self.head.x < 0 or self.head.x >= self.grid_size.x or self.head.y < 0 or self.head.y >= self.grid_size.y or self.head in [pos for pos, _direction in self.tail]:
             return True
         return False
 
@@ -172,7 +193,7 @@ class PySnake(GameScreen):
             for j in range(self.grid_size.x):
                 possible_spots.append(Point(j, i))
         possible_spots.remove(self.head)
-        for spot in self.tail:
+        for spot, _direction in self.tail:
             possible_spots.remove(spot)
         return choice(possible_spots)
 
