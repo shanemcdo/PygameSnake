@@ -13,8 +13,9 @@ class Direction(Enum):
 
 class DeathScreen(MenuScreen):
 
-    def __init__(self, screen: pygame.Surface, real_window_size: Point, window_size: Point, score: int):
+    def __init__(self, screen: pygame.Surface, game_screen: pygame.Surface, real_window_size: Point, window_size: Point, score: int):
         super().__init__(screen, real_window_size, window_size)
+        self.screen = game_screen
         self.play_again = True
         self.button_font = pygame.font.SysFont('Consolas', 13)
         self.sub_window_size = Point(200, 100)
@@ -81,7 +82,7 @@ class PySnake(GameScreen):
             self.move()
             self.update_tail()
             if self.check_collision():
-                death_screen = DeathScreen(self.real_screen, self.real_window_size, self.window_size, self.score)
+                death_screen = DeathScreen(self.real_screen, self.screen, self.real_window_size, self.window_size, self.score)
                 death_screen.run()
                 self.reset()
                 self.running = death_screen.play_again
