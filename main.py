@@ -32,8 +32,6 @@ class DeathScreen(MenuScreen):
             mouse_pos = Point._make(pygame.mouse.get_pos())
             mouse_pos = Point(mouse_pos.x // self.window_scale.x, mouse_pos.y // self.window_scale.y)
             for i, button in enumerate(self.buttons):
-                print(Rect(((button.rect.x + self.sub_window_rect.x, button.rect.y + self.sub_window_rect.y), button.rect.size)))
-                print(mouse_pos)
                 if Rect((button.rect.x + self.sub_window_rect.x, button.rect.y + self.sub_window_rect.y), button.rect.size).collidepoint(mouse_pos):
                     self.button_index = i
                     button()
