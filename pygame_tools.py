@@ -289,8 +289,8 @@ class GameScreen:
         self.real_screen = screen
         self.screen = screen if not self.window_scaled else pygame.Surface(window_size)
         self.real_window_size = real_window_size
-        self.window_scale = Point(real_window_size.x // window_size.x, real_window_size.y // window_size.y)
         self.window_size = window_size if self.window_scaled else real_window_size
+        self.window_scale = Point(real_window_size.x // window_size.x, real_window_size.y // window_size.y)
         self.frame_rate = frame_rate
         self.running = False
         self.rect = self.screen.get_rect()
