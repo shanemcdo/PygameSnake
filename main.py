@@ -17,7 +17,7 @@ class DeathScreen(MenuScreen):
         super().__init__(screen, real_window_size, window_size)
         self.play_again = True
         self.button_font = pygame.font.SysFont('Consolas', 13)
-        self.sub_window_size = Point(200, 200)
+        self.sub_window_size = Point(200, 100)
         self.sub_window = pygame.Surface(self.sub_window_size)
         self.button_size = Point(80, 20)
         self.buttons = [
@@ -25,6 +25,10 @@ class DeathScreen(MenuScreen):
                 Button(self.exit, 'Quit', Rect((self.sub_window_size.x - 10 - self.button_size.x, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font)
                 ]
         self.sub_window_rect = Rect((0, 0), self.sub_window_size)
+        self.title_text = pygame.font.SysFont('Consolas', 24).render('You Died!', True, (255, 255, 255))
+        self.title_pos = Point(self.sub_window_rect.centerx - self.title_text.get_width() / 2, self.sub_window_rect.top + 10)
+        self.sub_title_text = pygame.font.SysFont('Consolas', 20).render(f'score: {score}', True, (255, 255, 255))
+        self.sub_title_pos = Point(self.sub_window_rect.centerx - self.sub_title_text.get_width() / 2, self.sub_window_rect.top + 40)
         self.sub_window_rect.center = self.window_size.x // 2, self.window_size.y // 2
 
     def mouse_button_down(self, event: pygame.event.Event):
@@ -47,6 +51,8 @@ class DeathScreen(MenuScreen):
     def update(self):
         self.sub_window.fill((30, 30, 30))
         self.draw_buttons(self.sub_window)
+        self.sub_window.blit(self.title_text, self.title_pos)
+        self.sub_window.blit(self.sub_title_text, self.sub_title_pos)
         self.screen.blit(self.sub_window, self.sub_window_rect)
 
 class PySnake(GameScreen):
@@ -59,9 +65,9 @@ class PySnake(GameScreen):
         self.cell_size = Point(15, 15)
         self.reset()
         self.head_image = pygame.Surface(self.cell_size)
-        self.head_image.fill('#990000')
+        self.head_image.fill('#000099')
         self.fruit_image = pygame.Surface(self.cell_size)
-        self.fruit_image.fill('#000099')
+        self.fruit_image.fill('#990000')
         self.movement_delay = TrueEvery(5)
         self.score_font = pygame.font.SysFont('Consolas', 10)
 
