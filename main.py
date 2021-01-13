@@ -100,8 +100,8 @@ class PySnake(GameScreen):
                 Direction.DOWN: pygame.transform.rotate(tail_end_image, 180),
                 Direction.RIGHT: pygame.transform.rotate(tail_end_image, 270),
                 }
-        self.fruit_image = pygame.Surface(self.cell_size)
-        self.fruit_image.fill('#990000')
+        self.fruit_image = pygame.image.load('assets/logo.png')
+        pygame.display.set_icon(self.fruit_image)
         self.movement_delay = TrueEvery(5)
         self.score_font = pygame.font.SysFont('Consolas', 10)
 
