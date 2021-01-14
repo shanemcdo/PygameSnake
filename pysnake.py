@@ -54,6 +54,7 @@ class MainMenu(MenuScreen):
     def __init__(self):
         pygame.init()
         real_size = Point(600, 600)
+        pygame.display.set_icon(pygame.image.load('assets/logo.png'))
         super().__init__(pygame.display.set_mode(real_size), real_size, Point(real_size.x / 2, real_size.y / 2))
         self.background = pygame.image.load('assets/background.png')
         self.game = PySnake(self)
@@ -112,8 +113,7 @@ class PySnake(GameScreen):
                 Direction.DOWN: pygame.transform.rotate(tail_end_image, 180),
                 Direction.RIGHT: pygame.transform.rotate(tail_end_image, 270),
                 }
-        self.fruit_image = pygame.image.load('assets/logo.png')
-        pygame.display.set_icon(self.fruit_image)
+        self.fruit_image = pygame.image.load('assets/fruit.png')
         self.movement_delay = TrueEvery(5)
         self.score_font = pygame.font.SysFont('Consolas', 10)
 
