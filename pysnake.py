@@ -55,12 +55,26 @@ class DeathScreen(MenuScreen):
         self.sub_window.blit(self.sub_title_text, self.sub_title_pos)
         self.screen.blit(self.sub_window, self.sub_window_rect)
 
-class PySnake(GameScreen):
+class MainMenu(MenuScreen):
 
     def __init__(self):
         pygame.init()
         real_size = Point(600, 600)
         super().__init__(pygame.display.set_mode(real_size), real_size, Point(real_size.x / 2, real_size.y / 2))
+        self.game = PySnake(self)
+        font = pygame.font.SysFont('consolas', 25)
+        self.buttons = [
+                Button(self.game.run, 'Start', Rect(20, 230, 120, 50), font, highlight_color = None, border_size = 5, border_radius = 20),
+                Button(sys.exit, 'Exit', Rect(160, 230, 120, 50), font, highlight_color = None, border_size = 5, border_radius = 20),
+                ]
+
+    def key_down(self, _event: pygame.event.Event):
+        pass
+
+class PySnake(GameScreen):
+
+    def __init__(self, parent):
+        super().__init__(parent.real_screen, parent.real_window_size, parent.window_size)
         self.grid_size = Point(20, 20)
         self.cell_size = Point(15, 15)
         self.reset()
@@ -101,7 +115,6 @@ class PySnake(GameScreen):
                 }
         self.fruit_image = pygame.image.load('assets/logo.png')
         pygame.display.set_icon(self.fruit_image)
-        self.fruit_image = pygame.image.load('assets/logo.png')
         self.movement_delay = TrueEvery(5)
         self.score_font = pygame.font.SysFont('Consolas', 10)
 
@@ -225,4 +238,4 @@ class PySnake(GameScreen):
 
 
 if __name__ == '__main__':
-    PySnake().run()
+    MainMenu().run()
