@@ -55,12 +55,17 @@ class MainMenu(MenuScreen):
         pygame.init()
         real_size = Point(600, 600)
         super().__init__(pygame.display.set_mode(real_size), real_size, Point(real_size.x / 2, real_size.y / 2))
+        self.background = pygame.image.load('assets/background.png')
         self.game = PySnake(self)
         font = pygame.font.SysFont('consolas', 25)
         self.buttons = [
-                Button(self.game.run, 'Start', Rect(20, 230, 120, 50), font, highlight_color = None, border_size = 5, border_radius = 20),
-                Button(sys.exit, 'Exit', Rect(160, 230, 120, 50), font, highlight_color = None, border_size = 5, border_radius = 20),
+                Button(self.game.run, 'Start', Rect(20, 230, 120, 50), font, highlight_color = None, border_size = 2, border_radius = 20),
+                Button(sys.exit, 'Exit', Rect(160, 230, 120, 50), font, highlight_color = None, border_size = 2, border_radius = 20),
                 ]
+
+    def update(self):
+        self.screen.blit(self.background, (0, 0))
+        super().update()
 
     def key_down(self, _event: pygame.event.Event):
         pass
