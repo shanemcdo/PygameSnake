@@ -16,14 +16,13 @@ class DeathScreen(MenuScreen):
     def __init__(self, screen: pygame.Surface, game_screen: pygame.Surface, real_window_size: Point, window_size: Point, score: int):
         super().__init__(screen, real_window_size, window_size)
         self.screen = game_screen
-        self.play_again = True
         self.button_font = pygame.font.SysFont('Consolas', 13)
         self.sub_window_size = Point(200, 100)
         self.sub_window = pygame.Surface(self.sub_window_size, flags = SRCALPHA)
         self.button_size = Point(85, 20)
         self.buttons = [
-                Button(self.play_again_function, 'Play again?', Rect((10, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font, border_radius = 8, border_size = 1),
-                Button(self.exit, 'Quit', Rect((self.sub_window_size.x - 10 - self.button_size.x, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font, border_radius = 8, border_size = 1)
+                Button(self.play_again, 'Play again?', Rect((10, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font, border_radius = 8, border_size = 1),
+                Button(sys.exit, 'Quit', Rect((self.sub_window_size.x - 10 - self.button_size.x, self.sub_window_size.y - 10 - self.button_size.y), self.button_size), self.button_font, border_radius = 8, border_size = 1)
                 ]
         self.sub_window_rect = Rect((0, 0), self.sub_window_size)
         self.title_text = pygame.font.SysFont('Consolas', 24).render('You Died!', True, (255, 255, 255))
@@ -41,12 +40,7 @@ class DeathScreen(MenuScreen):
                     self.button_index = i
                     button()
 
-    def play_again_function(self):
-        self.play_again = True
-        self.running = False
-
-    def exit(self):
-        self.play_again = False
+    def play_again(self):
         self.running = False
 
     def update(self):
@@ -128,10 +122,8 @@ class PySnake(GameScreen):
             self.move()
             self.update_tail()
             if self.check_collision():
-                death_screen = DeathScreen(self.real_screen, self.screen, self.real_window_size, self.window_size, self.score)
-                death_screen.run()
+                DeathScreen(self.real_screen, self.screen, self.real_window_size, self.window_size, self.score).run()
                 self.reset()
-                self.running = death_screen.play_again
             elif self.check_fruit():
                 self.score += 1
                 self.length_to_add += 2
