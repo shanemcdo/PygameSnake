@@ -1,6 +1,6 @@
 """Basic classes for creating a pygame application"""
 
-import pygame, sys
+import pygame, math, sys
 from glob import glob
 from pygame.locals import *
 from recordclass import RecordClass
@@ -58,6 +58,15 @@ class TrueEvery:
 class Point(RecordClass):
     x: float
     y: float
+
+    @staticmethod
+    def distance(pos1: 'Point', pos2: 'Point') -> 'Point':
+        """takes two points and returns the distance between then in point format"""
+        if not isinstance(pos1, Point):
+            pos1 = Point._make(pos1)
+        if not isinstance(pos2, Point):
+            pos2 = Point._make(pos2)
+        return math.sqrt((pos2.x - pos1.x) ** 2 + (pos2.y - pos1.y) ** 2)
 
 def clip_surface(surface: pygame.Surface, rect: Rect) -> pygame.Surface:
     """Copy part of a pygame.Surface"""
@@ -142,6 +151,38 @@ class Animation:
         self.frame_count = len(self.frames)
         self.frame_index = 0
         self.frames_until_next = self.frames[0][1]
+
+class Circle:
+
+    def __init__(self, center: Point, radius: int, color: Color, width: int = 0):
+        self.center = Point._make(center)
+        self._radius = radius
+        self.diameter = radius * 2
+        self.color = color
+        self.width = width
+        self.rect = Rect(0, 0, self.diameter, self.diameter)
+        self.rect.center = self.center
+
+    @property
+    def radius(self) -> int:
+        return self._radius
+
+    @radius.setter
+    def radius(self, radius: int):
+        self._radius = radius
+        self.diameter = radius * 2
+        self.rect.w = self.diameter
+        self.rect.h = self.diameter
+        self.rect.center = self.center
+
+    def draw(self, screen: pygame.Surface):
+        pygame.draw.rect(screen, self.color, self.rect, self.width, self.radius)
+
+    def collide_point(self, point: Point, only_border: bool = False) -> bool:
+        if not isinstance(point, Point):
+            point = Point._make(point)
+        dist = int(Point.distance(self.center, point))
+        return only_border and dist <= self.radius and dist >= self.radius - self.width + 1 or (not only_border and dist <= self.radius)
 
 class Button:
     """A button in a pygame application"""
@@ -242,10 +283,10 @@ class ToggleButton:
             text_size = text_obj.get_size()
             screen.blit(text_obj, (self.rect.centerx - text_size[0] / 2, self.rect.centery - text_size[1] / 2))
         else:
-            pygame.draw.rect(screen, self.off_highlight_color if (override_highlight == None and self.highlight) or override_highlight else self.on_rect_color, self.rect, self.rect_line_width, self.border_radius)
+            pygame.draw.rect(screen, self.off_highlight_color if (override_highlight == None and self.highlight) or override_highlight else self.off_rect_color, self.rect, self.rect_line_width, self.border_radius)
             if self.border_size > 0:
                 pygame.draw.rect(screen, self.off_border_color, self.rect, self.border_size, self.border_radius)
-            text_obj = self.font.render(self.off_text, True, self.on_font_color)
+            text_obj = self.font.render(self.off_text, True, self.off_font_color)
             text_size = text_obj.get_size()
             screen.blit(text_obj, (self.rect.centerx - text_size[0] / 2, self.rect.centery - text_size[1] / 2))
 
@@ -296,6 +337,10 @@ class GameScreen:
         self.rect = self.screen.get_rect()
         self.clock = pygame.time.Clock()
         self.game_ticks = 0
+
+    def get_scaled_mouse_pos(self) -> Point:
+        pos = pygame.mouse.get_pos()
+        return Point(pos[0] // self.window_scale.x, pos[1] // self.window_scale.y)
 
     def tick(self):
         self.clock.tick(self.frame_rate)
@@ -381,9 +426,10 @@ class MenuScreen(GameScreen):
 
     def mouse_button_down(self, event: pygame.event.Event):
         if event.button == 1:
-            mouse_pos = Point._make(pygame.mouse.get_pos())
             if self.window_scaled:
-                mouse_pos = Point(mouse_pos.x // self.window_scale.x, mouse_pos.y // self.window_scale.y)
+                mouse_pos = self.get_scaled_mouse_pos()
+            else:
+                mouse_pos = Point._make(pygame.mouse.get_pos())
             for i, button in enumerate(self.buttons):
                 if button.rect.collidepoint(mouse_pos):
                     self.button_index = i
