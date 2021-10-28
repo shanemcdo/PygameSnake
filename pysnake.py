@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import pygame
 from copy import copy
 from enum import Enum
